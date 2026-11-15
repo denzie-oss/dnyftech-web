@@ -3,15 +3,57 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>dnyftech</title>
+  <style>
+    body { font-family: sans-serif; max-width: 480px; margin: 0 auto; padding: 16px; background: #0f1115; color: #eee; }
+    h1 { margin-top: 8px; }
+    input { width: 100%; padding: 12px; font-size: 16px; border-radius: 8px; border: 1px solid #333; background: #1a1d24; color: #eee; box-sizing: border-box; }
+    button { width: 100%; margin: 8px 0 16px; padding: 12px; font-size: 16px; border: 0; border-radius: 8px; background: #f6821f; color: #000; font-weight: 600; }
+    li { background: #1a1d24; padding: 10px; border-radius: 8px; margin-bottom: 8px; list-style: none; }
+    small { color: #888; display: block; }
+    ul { padding: 0; }
+  </style>
 </head>
 <body>
   <h1>dnyftech</h1>
-  <p id="out">Loading...</p>
+  <input id="text" placeholder="Write a note..." maxlength="500">
+  <button id="add">Save note</button>
+  <ul id="list"></ul>
   <script>
-    fetch("https://api.dnyflab.workers.dev/api/hello")
-      .then(r => r.json())
-      .then(d => out.textContent = JSON.stringify(d))
-      .catch(e => out.textContent = "Error: " + e);
+    const API = "https://api.dnyflab.workers.dev/api/notes";
+    const list = document.getElementById("list");
+    const input = document.getElementById("text");
+
+    async function load() {
+      try {
+        const res = await fetch(API);
+        const notes = await res.json();
+        list.innerHTML = "";
+        for (const n of notes) {
+          const li = document.createElement("li");
+          li.textContent = n.text;
+          const s = document.createElement("small");
+          s.textContent = n.created_at;
+          li.appendChild(s);
+          list.appendChild(li);
+        }
+      } catch (e) {
+        list.textContent = "Error: " + e;
+      }
+    }
+
+    document.getElementById("add").onclick = async () => {
+      const text = input.value.trim();
+      if (!text) return;
+      await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      input.value = "";
+      load();
+    };
+
+    load();
   </script>
 </body>
 </html>
