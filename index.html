@@ -8,7 +8,7 @@
   <h1>dnyftech</h1>
   <p id="out">Loading...</p>
   <script>
-    fetch("https://dnyftech-api.dnyflab.workers.dev")
+    fetch("https://api.dnyflab.workers.dev")
       .then(r => r.json())
       .then(d => out.textContent = JSON.stringify(d))
       .catch(e => out.textContent = "Error: " + e);
